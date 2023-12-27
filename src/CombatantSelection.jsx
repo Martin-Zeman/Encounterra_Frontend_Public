@@ -6,12 +6,13 @@ class CombatantSelection extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      blueTeam: [],
-      redTeam: [],
+      blueTeamIds: [],
+      redTeamIds: [],
+      blueTeamNames: [],
+      redTeamNames: [],
       availableCombatants: [],
     };
   }
-
 
   componentDidMount() {
     fetch('https://encounterra.com/api/combatant-definition')
@@ -24,22 +25,19 @@ class CombatantSelection extends React.Component {
       });
   }
 
-  addToTeam = (team) => {
-    let selectedCombatants;
-    if (team === 'blue') {
-      selectedCombatants = Array.from(document.querySelector('[name="availableCombatants"]').selectedOptions, option => option.value);
-      this.setState(prevState => ({ blueTeam: [...prevState.blueTeam, ...selectedCombatants] }), () => {
-        this.props.onTeamChange(this.state.blueTeam, this.state.redTeam);
-      });
-    } else if (team === 'red') {
-      selectedCombatants = Array.from(document.querySelector('[name="availableCombatants"]').selectedOptions, option => option.value);
-      this.setState(prevState => ({ redTeam: [...prevState.redTeam, ...selectedCombatants] }), () => {
-        this.props.onTeamChange(this.state.blueTeam, this.state.redTeam);
-      });
-    }
+addToTeam = (team) => {
+  let selectedOptions = Array.from(document.querySelector('[name="availableCombatants"]').selectedOptions);
+  let selectedCombatants = selectedOptions.map(option => ({
+    id: option.value,
+    name: option.text
+  }));
+
+  if (team === 'blue') {
+    this.props.onTeamChange([...this.props.blueTeam, ...selectedCombatants], this.props.redTeam);
+  } else if (team === 'red') {
+    this.props.onTeamChange(this.props.blueTeam, [...this.props.redTeam, ...selectedCombatants]);
+  }
 }
-
-
 
   render() {
     const blueTeam = this.props.blueTeam;
@@ -48,16 +46,13 @@ class CombatantSelection extends React.Component {
       <div>
         <form onSubmit={this.handleSubmit}>
           <label>Combatants:</label>
-          <select
-            name="availableCombatants"
-            multiple
-          >
-            {this.state.availableCombatants.map((combatant, index) => (
-              <option key={index} value={combatant.name}>
-                {combatant.name}
-              </option>
-            ))}
-          </select>
+          <select name="availableCombatants" multiple>
+          {this.state.availableCombatants.map(combatant => (
+            <option key={combatant.id} value={combatant.id}>
+              {combatant.name}
+            </option>
+          ))}
+        </select>
           <div className="teams-container">
             <div className="team-column">
               <div>
@@ -71,7 +66,7 @@ class CombatantSelection extends React.Component {
               <div className="team-selection">
                 <h2>Selected Blue Team</h2>
                 {blueTeam.map((combatant, index) => (
-                  <div key={index}>{combatant}</div>
+                  <div key={index}>{combatant.name}</div>
                 ))}
               </div>
             </div>
@@ -88,7 +83,7 @@ class CombatantSelection extends React.Component {
               <div className="team-selection">
                 <h2>Selected Red Team</h2>
                 {redTeam.map((combatant, index) => (
-                  <div key={index}>{combatant}</div>
+                  <div key={index}>{combatant.name}</div>
                 ))}
               </div>
             </div>

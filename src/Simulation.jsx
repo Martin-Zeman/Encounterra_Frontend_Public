@@ -74,10 +74,14 @@ class Simulation extends React.Component {
 
     const { iterations } = this.state;
 
+    // Extract IDs from the team objects
+    const blueTeamIds = this.props.blueTeam.map(combatant => combatant.id);
+    const redTeamIds = this.props.redTeam.map(combatant => combatant.id);
+
     const data = {
       iterations: parseInt(iterations),
-      blue: this.props.blueTeam,
-      red: this.props.redTeam,
+      blue: blueTeamIds,
+      red: redTeamIds,
     };
 
     fetch('https://encounterra.com/api/simulate', {
@@ -177,7 +181,7 @@ class Simulation extends React.Component {
               <div className="team-selection">
                 <h2>Selected Blue Team</h2>
                 {this.props.blueTeam.map((combatant, index) => (
-                  <div key={index}>{combatant}</div>
+                  <div key={index}>{combatant.name}</div>
                 ))}
               </div>
             </div>
@@ -185,7 +189,7 @@ class Simulation extends React.Component {
               <div className="team-selection">
                 <h2>Selected Red Team</h2>
                 {this.props.redTeam.map((combatant, index) => (
-                  <div key={index}>{combatant}</div>
+                  <div key={index}>{combatant.name}</div>
                 ))}
               </div>
             </div>
